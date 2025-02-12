@@ -25,14 +25,16 @@ class IncomeSourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = IncomeSource
         fields = ['name', 'description', 'link', 'transactions', 'created_at']
+        read_only_fields = ['transactions', 'created_at']
 
     def to_representation(self, instance):
         """
         Override the default representation of an instance to include transactions if they exist.
         """
         representation = super().to_representation(instance)
-        if instance.transactions:
+        if hasattr(instance, 'transactions'):
             representation['transactions'] = instance.transactions
+
         return representation
 
     def validate_name(self, value):
