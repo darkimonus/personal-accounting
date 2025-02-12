@@ -25,7 +25,8 @@ When containers are running, you will need to create superuser. Use following co
 and provide needed information. Then you will need to create application for JWT tokens. Go to 
 http://0.0.0.0:8000/admin/oauth2_provider/application/add/ and fill form as shown below:
 ![create application screenshot 1](docs/images/jwt_application_1.png)
-**IMPORTANT:** Don't forget to change redirect uri, and don't change client id and client secret!
+**IMPORTANT:** Don't forget to change redirect uri, and don't change client id and client secret (django will 
+generate it automatically)!
 ![create application screenshot 2](docs/images/jwt_application_2.png)  
 
 Now you can use Postman to work with API.
