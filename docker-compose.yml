@@ -1,0 +1,112 @@
+services:
+  accounting-postgres:
+    image: postgres:14.2
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    restart: unless-stopped
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - accounting-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "5"
+
+  accounting-cache:
+    image: redis:7.0
+    restart: always
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
+    env_file:
+      - ${SOURCE_FOLDER}/.env
+    command: redis-server --save 20 1 --loglevel warning --port ${REDIS_PORT}
+    volumes:
+      - cache:/data
+    networks:
+      - accounting-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "5"
+
+  accounting-wsgi:
+    restart: unless-stopped
+    container_name: accounting-wsgi
+    build: .
+    expose:
+      - 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./${SOURCE_FOLDER}:/app
+    env_file:
+      - ${SOURCE_FOLDER}/.env
+    environment:
+      - CONTAINER_TYPE=master
+    depends_on:
+      - accounting-postgres
+      - accounting-cache
+    networks:
+      - accounting-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "5"
+
+  celery:
+    build: .
+    volumes:
+      - ./${SOURCE_FOLDER}:/app
+    env_file:
+      - ${SOURCE_FOLDER}/.env
+    environment:
+      - CONTAINER_TYPE=worker
+      - CELERY_BROKER=redis://accounting-cache:${REDIS_PORT}/2
+      - CELERY_BACKEND=redis://accounting-cache:${REDIS_PORT}/2
+    restart: unless-stopped
+    depends_on:
+      - accounting-wsgi
+      - accounting-postgres
+      - accounting-cache
+    networks:
+      - accounting-net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10M"
+        max-file: "5"
+
+  celery_beat:
+    build: .
+    volumes:
+      - ./${SOURCE_FOLDER}:/app
+    env_file:
+      - ${SOURCE_FOLDER}/.env
+    environment:
+      - CONTAINER_TYPE=beat
+      - CELERY_BROKER=redis://accounting-cache:${REDIS_PORT}/2
+      - CELERY_BACKEND=redis://accounting-cache:${REDIS_PORT}/2
+    restart: unless-stopped
+    depends_on:
+      - accounting-wsgi
+      - accounting-postgres
+      - accounting-cache
+    networks:
+      - accounting-net
+
+volumes:
+  pgdata:
+    driver: local
+  cache:
+    driver: local
+
+networks:
+  accounting-net:
