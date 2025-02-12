@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "users",
+    "incomes",
     "oauth2_provider",
     "rest_framework",
     'rest_framework.authtoken',

@@ -22,6 +22,9 @@ class IncomeSource(models.Model):
         verbose_name = _('Income source')
         verbose_name_plural = _('Income source\'s')
 
+    def __str__(self):
+        return f"{self.user.email}: {self.name}"
+
 
 class IncomeTax(models.Model):
     name = models.CharField(max_length=100)

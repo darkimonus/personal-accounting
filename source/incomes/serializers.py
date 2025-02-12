@@ -6,7 +6,7 @@ class IncomeSourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = IncomeSource
-        fields = '__all__'
+        fields = ['name', 'description', 'link']
 
 
 class IncomeTaxSerializer(serializers.ModelSerializer):
