@@ -27,6 +27,7 @@ def apply_filters(
         The filtered and ordered queryset.
     """
     queryset = queryset.filter(user=user)
+
     queryset = queryset.annotate(transactions=Count('income_transactions'))
 
     if order_by == 'transactions':
