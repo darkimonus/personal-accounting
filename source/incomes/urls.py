@@ -1,6 +1,9 @@
-from django.urls import path, include
-from incomes.views import IncomeSourcesView
+from django.urls import path
+from incomes.views import IncomeSourcesView,  IncomeTaxesView
 
 urlpatterns = [
-    path('income-sources/', IncomeSourcesView.as_view(), name='income_sources'),
+    path('sources/', IncomeSourcesView.as_view(
+        actions={'get': 'list', 'post': 'create'}),
+        name='income-sources'),
+    path('taxes/', IncomeTaxesView.as_view(), name='income-taxes'),
 ]

@@ -21,6 +21,7 @@ class IncomeSource(models.Model):
     class Meta:
         verbose_name = _('Income source')
         verbose_name_plural = _('Income source\'s')
+        unique_together = ('user', 'name')
 
     def __str__(self):
         return f"{self.user.email}: {self.name}"
@@ -42,7 +43,12 @@ class IncomeTax(models.Model):
 
 
 class IncomeTransaction(models.Model):
-    source = models.ForeignKey(IncomeSource, on_delete=models.SET_NULL, null=True)
+    source = models.ForeignKey(
+        IncomeSource,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='income_transactions'
+    )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField(default=timezone.now)
     taxes = models.ManyToManyField(IncomeTax, blank=True)
