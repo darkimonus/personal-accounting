@@ -12,13 +12,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     User model.
     """
     email = models.EmailField(unique=True)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=30, blank=True)
     phone_number = models.CharField(
         "Phone",
         validators=[RegexValidator(regex=r"^\+?1?\d{8,15}$")],
         max_length=16,
         unique=False,
+        blank=True,
     )
     date_joined = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
