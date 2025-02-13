@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "users",
     "incomes",
+    "expenses.AppConfig",
     "oauth2_provider",
     "rest_framework",
     'rest_framework.authtoken',
@@ -182,7 +183,7 @@ if ENABLE_OAUTH:
     ]
     # Token settings
     # convert our base token into jwt format [NOT NEEDED]
-    ACTIVATE_JWT = os.getenv("ACTIVATE_JWT") == "True" # 1 day
+    ACTIVATE_JWT = os.getenv("ACTIVATE_JWT") == "True"  # 1 day
     oauth2_settings.defaults["ACCESS_TOKEN_EXPIRE_SECONDS"] = TOKEN_DURATION_SEC
 
 ENABLE_GOOGLE_OAUTH = os.getenv("ENABLE_GOOGLE_OAUTH") == "True"

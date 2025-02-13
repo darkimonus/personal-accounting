@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from expenses.models import Expense
+from expenses.models import Receipt, Expense
 
 
 def calculate_receipt_item_unit_price(unit_type,
@@ -18,9 +18,15 @@ def calculate_receipt_item_unit_price(unit_type,
     return unit_price
 
 
-def calculate_expense_total(expense: Expense) -> Expense:
+def calculate_receipt_total(instance: Receipt) -> Decimal:
     total = Decimal(0.0)
-    for receipt in expense.receipts:
+    for item in instance.receipt_items:
+        total += item.total_price
+    return total
+
+
+def calculate_expense_total(instance: Expense) -> Decimal:
+    total = Decimal(0.0)
+    for receipt in instance.receipts:
         total += receipt.total_price
-    expense.total = total
-    return expense
+    return total

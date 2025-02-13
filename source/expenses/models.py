@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 
 from expenses.choices import UNIT_CHOICES, CATEGORY_CHOICES
 from expenses.validators import QuantityValidator
-from expenses.utils import calculate_receipt_item_unit_price
 from expenses.managers import PurchaseManager, ReceiptItemManager, ReceiptManager, ExpenseManager
 
 from decimal import Decimal
@@ -97,16 +96,9 @@ class ReceiptItem(models.Model):
         on_delete=models.CASCADE,
         db_index=True
     )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     objects = ReceiptItemManager()
-
-    def save(self, *args, **kwargs):
-        self.unit_price = calculate_receipt_item_unit_price(
-            self.purchase.unit_type,
-            self.total_price,
-            self.quantity,
-        )
-        super().save(*args, **kwargs)
 
 
 class Receipt(models.Model):
@@ -140,8 +132,17 @@ class Receipt(models.Model):
         on_delete=models.CASCADE,
         db_index=True
     )
+    total_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[
+            MinValueValidator(Decimal('0.001')),
+        ],
+        blank=True,
+    )
 
     objects = ReceiptManager()
+
 
 
 class Expense(models.Model):
