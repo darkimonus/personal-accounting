@@ -49,7 +49,7 @@ class BaseIncomeViewSet(GenericViewSet,
         if order_by and order_by not in valid_order_by_args:
             raise ValueError(f"Provided order_by value '{order_by}' is invalid. "
                              f"Please provide one of this values {valid_order_by_args}")
-        if order_direction not in valid_order_directions:
+        if order_direction and order_direction not in valid_order_directions:
             raise ValueError(f"Provided order_direction value '{order_direction}' is invalid. "
                              f'Please provide one of this values {valid_order_directions}')
         if date_filter:

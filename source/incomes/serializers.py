@@ -1,10 +1,15 @@
 from rest_framework import serializers
+
 from incomes.models import IncomeSource, IncomeTax, IncomeTransaction
+from incomes.utils import calculate_income_after_taxes
 
 
 class BaseIncomeSerializer(serializers.ModelSerializer):
     transactions = serializers.IntegerField(read_only=True)
-    created_at = serializers.DateTimeField(read_only=True, format='%Y-%m-%d')
+    created_at = serializers.DateTimeField(
+        read_only=True,
+        format='%Y-%m-%d'
+    )
 
     class Meta:
         fields = ['name', 'description', 'transactions', 'created_at']
@@ -54,10 +59,19 @@ class TaxField(serializers.RelatedField):
 
 class IncomeTransactionSerializer(serializers.ModelSerializer):
     source = serializers.PrimaryKeyRelatedField(
-        queryset=IncomeSource.objects.all(), required=False, allow_null=True
+        queryset=IncomeSource.objects.all(),
+        required=False,
+        allow_null=True
     )
-    taxes = TaxField(queryset=IncomeTax.objects.all(), many=True, required=False)
-    created_at = serializers.DateTimeField(read_only=True, format='%Y-%m-%d')
+    taxes = TaxField(
+        queryset=IncomeTax.objects.all(),
+        many=True,
+        required=False
+    )
+    created_at = serializers.DateTimeField(
+        read_only=True,
+        format='%Y-%m-%d'
+    )
     total_after_taxes = serializers.SerializerMethodField()
     taxes_count = serializers.IntegerField(read_only=True)
 
@@ -67,8 +81,7 @@ class IncomeTransactionSerializer(serializers.ModelSerializer):
         read_only_fields = ['total_after_taxes', 'created_at', 'taxes_count']
 
     def get_total_after_taxes(self, obj):
-        total_tax_rate = sum(tax.rate for tax in obj.taxes.all())
-        return obj.amount * (1 - total_tax_rate)
+        return calculate_income_after_taxes(obj)
 
     def validate(self, data):
         if data.get('amount', 0) <= 0:
