@@ -1,5 +1,5 @@
 from django.urls import path
-from incomes.views import IncomeSourcesView,  IncomeTaxesView
+from incomes.views import IncomeSourcesView,  IncomeTaxesView, IncomeTransactionsView
 
 urlpatterns = [
     path('sources/', IncomeSourcesView.as_view(
@@ -14,4 +14,10 @@ urlpatterns = [
     path('taxes/<int:pk>/', IncomeTaxesView.as_view(
         actions={'patch': 'partial_update', 'get': 'retrieve'}),
         name='income-tax'),
+    path('transactions/', IncomeTransactionsView.as_view(
+        actions={'get': 'list', 'post': 'create'}),
+         name='income-transactions'),
+    path('transactions/<int:pk>/', IncomeTransactionsView.as_view(
+        actions={'patch': 'partial_update', 'get': 'retrieve'}),
+         name='income-transaction'),
 ]

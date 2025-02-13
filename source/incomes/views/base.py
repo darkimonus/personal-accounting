@@ -1,10 +1,8 @@
 from rest_framework import mixins, status
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 
-from incomes.utils import apply_filters
+from datetime import datetime
 
 
 class BaseIncomeViewSet(GenericViewSet,
@@ -20,47 +18,46 @@ class BaseIncomeViewSet(GenericViewSet,
         serializer.is_valid(raise_exception=True)
         return self.create(request, serializer)
 
-    @swagger_auto_schema(
-        operation_description="Retrieve user's income list.",
-        manual_parameters=[
-            openapi.Parameter(
-                'order_by',
-                openapi.IN_QUERY,
-                description="Ordering parameter.",
-                type=openapi.TYPE_STRING,
-                default='transactions',
-            ),
-            openapi.Parameter(
-                'order_direction',
-                openapi.IN_QUERY,
-                description="Sorting direction.",
-                type=openapi.TYPE_STRING,
-                default='desc',
-            ),
-            openapi.Parameter(
-                'date_filter',
-                openapi.IN_QUERY,
-                description="Date filtering.",
-                type=openapi.TYPE_STRING,
-                required=False,
-            ),
-        ],
-        responses={200: 'Serializer(many=True)', 400: "Bad Request", 401: "Unauthorized"},
-    )
     def list(self, request, *args, **kwargs):
-        order_by = request.query_params.get('order_by', 'transactions')
-        order_direction = request.query_params.get('order_direction', 'desc')
+        order_by = request.query_params.get('order_by', None)
+        order_direction = request.query_params.get('order_direction', None)
         date_filter = request.query_params.get('date_filter', None)
 
-        queryset = apply_filters(
-            self.get_queryset(),
-            request.user,
-            order_by,
-            order_direction,
-            date_filter
-        )
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return order_by, order_direction, date_filter
+
+    @staticmethod
+    def validate_list_query_params(valid_order_by_args: list,
+                                   valid_order_directions: list,
+                                   order_by=None,
+                                   order_direction=None,
+                                   date_filter=None):
+        """
+        Validate query parameters for list operations.
+
+        Args:
+            valid_order_by_args (list): A list of valid order_by arguments.
+            valid_order_directions (list): A list of valid order directions.
+            order_by (str, optional): The field to order by. Defaults to None.
+            order_direction (str, optional): The direction of ordering. Defaults to None.
+            date_filter (str, optional): A date filter in YYYY-MM-DD format. Defaults to None.
+
+        Raises:
+            ValueError: If order_by is not in valid_order_by_args.
+            ValueError: If order_direction is not in valid_order_directions.
+            ValueError: If date_filter is not a valid date in YYYY-MM-DD format.
+        """
+        if order_by and order_by not in valid_order_by_args:
+            raise ValueError(f"Provided order_by value '{order_by}' is invalid. "
+                             f"Please provide one of this values {valid_order_by_args}")
+        if order_direction not in valid_order_directions:
+            raise ValueError(f"Provided order_direction value '{order_direction}' is invalid. "
+                             f'Please provide one of this values {valid_order_directions}')
+        if date_filter:
+            try:
+                datetime.strptime(date_filter, "%Y-%m-%d")
+            except ValueError:
+                raise ValueError(f"Provided date_filter value '{date_filter}' is invalid. "
+                                 f"Please provide a valid date in YYYY-MM-DD format.")
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
