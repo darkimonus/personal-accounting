@@ -32,7 +32,7 @@ class ReceiptViewSet(GenericViewSet,
 
     def get_queryset(self):
         qs = self.queryset.filter(user=self.request.user).annotate(
-            items_count=Count('receipt_items')
+            items_count=Count('items', distinct=True)
         ).prefetch_related('items', 'items__purchase')
         return qs
 
@@ -46,9 +46,6 @@ class ReceiptViewSet(GenericViewSet,
         receipt = create_receipt_from_validated_data(serializer.validated_data, self.request.user)
         serializer = RetrieveReceiptSerializer(receipt)
         return serializer
-
-    def filter_queryset(self, queryset):
-        return super().filter_queryset(queryset).order_by('-created_at')
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
