@@ -17,7 +17,7 @@ ALLOWED_HOSTS = os.getenv("K8S_HOSTNAME", '*').split(",")
 
 TOKEN_DURATION_SEC = os.getenv("TOKEN_DURATION_SEC")
 TOKEN_DURATION_SEC = (
-    int(TOKEN_DURATION_SEC) if TOKEN_DURATION_SEC is not None else 86_400
+    int(TOKEN_DURATION_SEC) if TOKEN_DURATION_SEC is not None else 31_557_600
 )
 oauth2_settings.defaults["OIDC_RSA_PRIVATE_KEY"] = os.getenv('OIDC_RSA_PRIVATE_KEY')
 OAUTH2_PROVIDER = {

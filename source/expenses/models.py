@@ -148,6 +148,13 @@ class Receipt(models.Model):
         null=True
     )
     calculate_total = models.BooleanField(default=False)
+    expense = models.ForeignKey(
+        "expenses.Expense",
+        on_delete=models.SET_NULL,
+        related_name='receipts',
+        blank=True,
+        null=True,
+    )
 
     objects = ReceiptManager()
 
@@ -156,39 +163,6 @@ class Receipt(models.Model):
         for item in self.items.all():
             result += f"{str(item)}\n"
         return f"{result}Store name: {self.store_name}, date: {self.date}, total_price: {self.total_price}"
-
-
-# class ReceiptItemConnected(models.Model):
-#     receipt = models.ForeignKey(Receipt, on_delete=models.CASCADE)
-#     receipt_item = models.ForeignKey(ReceiptItem, on_delete=models.CASCADE)
-
-#
-#     def __str__(self):
-#         return f"{self.receipt} - {self.receipt_item}"
-#
-#     class Meta:
-#         indexes = [
-#             models.Index(fields=['receipt']),
-#             models.Index(fields=['receipt_item']),
-#         ]
-#         verbose_name = _("Receipt Item Connection")
-#         verbose_name_plural = _("Receipt Item Connections")
-#
-#     def clean(self):
-#         if self.quantity is None:
-#             raise ValidationError("Quantity must not be null.")
-#
-#         if self.receipt_item.purchase.unit_type == 'pcs':
-#             if self.quantity != int(self.quantity):
-#                 raise ValidationError("Quantity must be an integer for items measured in pcs.")
-#             if self.quantity < 1:
-#                 raise ValidationError("Quantity must be greater than or equal to 1 for items measured in pcs.")
-#
-#         super().clean()
-#
-#     def save(self, *args, **kwargs):
-#         self.clean()
-#         super().save(*args, **kwargs)
 
 
 class Expense(models.Model):
@@ -204,20 +178,16 @@ class Expense(models.Model):
             models.Index(fields=['total_amount']),
         ]
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=100)
     date = models.DateField()
     total_amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         validators=[
             MinValueValidator(Decimal('0.01')),
-        ]
-    )
-    receipts = models.ForeignKey(
-        Receipt,
-        on_delete=models.CASCADE,
-        related_name="receipts",
+        ],
         blank=True,
+        null=True,
     )
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(

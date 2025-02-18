@@ -1,5 +1,5 @@
 from django.urls import path
-from expenses.views import ReceiptViewSet
+from expenses.views import ReceiptViewSet, ExpenseViewSet
 
 urls = [
     path(
@@ -12,4 +12,9 @@ urls = [
         ReceiptViewSet.as_view({'get': 'retrieve', 'put': 'update'}),
         name='expenses-receipt-detail'
     ),
+    path(
+        '',
+        ExpenseViewSet.as_view({'get': 'list', 'post': 'create'}),
+        name='expenses-list'
+    )
 ]

@@ -10,6 +10,7 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 from users import urls as users_urls
 from incomes.urls import urlpatterns as incomes_urls
+from expenses.urls import urls as expenses_urls
 
 SchemaView = get_schema_view(
     openapi.Info(
@@ -49,7 +50,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("auth/", include(auth_urlpatterns)),
     path('users/', include(users_urls)),
-    path('income/', include(incomes_urls)),
+    path('incomes/', include(incomes_urls)),
+    path('expenses/', include(expenses_urls)),
 ]
 
 if settings.DEBUG:

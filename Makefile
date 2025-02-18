@@ -58,6 +58,11 @@ stop: ## RUN: STOP containers
 	@printf "$$BGreen Stopping containers (time for a coffee break ☕ !) $$ColorOff \n"
 	$(dc) stop
 
+.PHONY: down-v
+down-v: ## RUN: STOP containers
+	@printf "$$BGreen Stopping containers (time for a coffee break ☕ !) $$ColorOff \n"
+	$(dc) down -v
+
 .PHONY: restart
 restart: ## RUN: STOP containers
 	@printf "$$BGreen Restarting containers... $$ColorOff \n"

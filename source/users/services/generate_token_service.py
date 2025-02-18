@@ -53,6 +53,4 @@ class GenerateTokenMixin:
             }
             return token_pair
         except Exception as error:
-            print(f'\n\n\nError: {error}'
-                  f'App: {app}\n\n\n')
             raise ValueError(error)

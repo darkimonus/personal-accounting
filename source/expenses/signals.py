@@ -22,4 +22,5 @@ def update_receipt_item_unit_price(sender, instance, **kwargs):
 def update_expense_total_amount(sender, instance, **kwargs):
     if instance.calculate_total:
         total_amount = calculate_expense_total(instance)
-        Expense.objects.filter(pk=instance.pk).update(total_price=total_amount)
+        print(f'\n\nTotal amount: {total_amount}\n\n')
+        Expense.objects.filter(pk=instance.pk).update(total_amount=total_amount)
