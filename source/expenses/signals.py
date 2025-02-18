@@ -24,3 +24,4 @@ def update_expense_total_amount(sender, instance, **kwargs):
         total_amount = calculate_expense_total(instance)
         print(f'\n\nTotal amount: {total_amount}\n\n')
         Expense.objects.filter(pk=instance.pk).update(total_amount=total_amount)
+# test
